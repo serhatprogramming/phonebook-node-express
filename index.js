@@ -78,15 +78,36 @@ app.post("/api/persons", async (req, res) => {
   }
 });
 
-app.delete("/api/persons/:id", async (req, res) => {
+app.delete("/api/persons/:id", async (req, res, next) => {
   try {
     const result = await Person.findByIdAndRemove(req.params.id);
-    res.status(204).end();
+    if (result) {
+      console.log("result: " + result);
+      res.status(204).end();
+    } else {
+      res.status(404).json({ error: "person not found" }).end();
+    }
   } catch (error) {
-    res.status(404).json({
-      error: `There is no person with the id ${req.params.id}`,
-      errorMessage: error.message,
-    });
+    next(error);
+  }
+});
+
+app.put("/api/persons/:id", async (req, res, next) => {
+  const { name, number } = req.body;
+
+  try {
+    // only update the number not the name
+    const person = await Person.findById(req.params.id);
+    const updatedPerson = await Person.findByIdAndUpdate(
+      req.params.id,
+      { name: person.name, number },
+      {
+        new: true,
+      }
+    );
+    res.json(updatedPerson);
+  } catch (error) {
+    next(error);
   }
 });
 
