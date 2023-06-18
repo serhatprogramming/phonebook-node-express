@@ -81,7 +81,6 @@ app.post("/api/persons", async (req, res, next) => {
         await newPerson.save();
         res.json(newPerson);
       } catch (error) {
-        console.log(">>>>>error>::", error.name);
         next(error);
       }
     }
@@ -111,9 +110,7 @@ app.put("/api/persons/:id", async (req, res, next) => {
     const updatedPerson = await Person.findByIdAndUpdate(
       req.params.id,
       { name: person.name, number },
-      {
-        new: true,
-      }
+      { new: true, runValidators: true, context: "query" }
     );
     res.json(updatedPerson);
   } catch (error) {
