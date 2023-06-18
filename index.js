@@ -12,6 +12,7 @@ app.use(express.json());
 app.use(express.static("build"));
 
 // morgan logger middleware
+// eslint-disable-next-line no-unused-vars
 morgan.token("body", function (req, res) {
   return JSON.stringify(req.body);
 });
@@ -102,7 +103,7 @@ app.delete("/api/persons/:id", async (req, res, next) => {
 });
 
 app.put("/api/persons/:id", async (req, res, next) => {
-  const { name, number } = req.body;
+  const { number } = req.body;
 
   try {
     // only update the number not the name
