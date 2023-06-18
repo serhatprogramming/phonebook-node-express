@@ -25,6 +25,11 @@ const errorHandler = (error, request, response, next) => {
   if (error.name === "CastError") {
     return response.status(400).send({ error: "malformatted id" });
   }
+  if (error.name === "ValidationError") {
+    return response.status(400).send({
+      error: error.message,
+    });
+  }
   next(error);
 };
 // unknown endpoint middleware
@@ -60,7 +65,7 @@ app.get("/api/persons/:id", async (req, res, next) => {
   }
 });
 
-app.post("/api/persons", async (req, res) => {
+app.post("/api/persons", async (req, res, next) => {
   const { name, number } = req.body;
   if (!name || !number) {
     return res.status(400).json({ error: "Name and number are required!" });
@@ -72,8 +77,13 @@ app.post("/api/persons", async (req, res) => {
         name,
         number,
       });
-      newPerson.save();
-      res.json(newPerson);
+      try {
+        await newPerson.save();
+        res.json(newPerson);
+      } catch (error) {
+        console.log(">>>>>error>::", error.name);
+        next(error);
+      }
     }
   }
 });
