@@ -10,7 +10,19 @@ mongoose
 
 const personSchema = new mongoose.Schema({
   name: { type: String, required: true, minLength: 3 },
-  number: { type: String, required: true, minLength: 1 },
+  number: {
+    type: String,
+    validate: {
+      validator: function (value) {
+        const regex = /^\d{2,3}-\d+$/; // Regular expression pattern for validation
+        return regex.test(value);
+      },
+      message:
+        "The field must be in the format of XX-XXXXXXXX or XXX-XXXXXXXX.",
+    },
+    minLength: 8,
+    required: true,
+  },
 });
 
 personSchema.set("toJSON", {
